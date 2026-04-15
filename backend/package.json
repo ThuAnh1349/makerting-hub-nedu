@@ -1,0 +1,26 @@
+{
+  "name": "nedu-marketing-hub-api",
+  "version": "1.0.0",
+  "module": "src/index.ts",
+  "type": "module",
+  "scripts": {
+    "dev": "bun run --watch src/index.ts",
+    "start": "bun run src/index.ts",
+    "migrate": "bun run src/db/migrate.ts"
+  },
+  "dependencies": {
+    "pg": "^8.11.3",
+    "zod": "^3.22.4",
+    "jsonwebtoken": "^9.0.2",
+    "node-telegram-bot-api": "^0.66.0",
+    "nodemailer": "^6.9.9",
+    "crypto": "latest"
+  },
+  "devDependencies": {
+    "@types/pg": "^8.11.2",
+    "@types/jsonwebtoken": "^9.0.6",
+    "@types/nodemailer": "^6.4.14",
+    "typescript": "^5.3.3",
+    "bun-types": "latest"
+  }
+}

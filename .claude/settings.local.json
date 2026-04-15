@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__Claude_Preview__preview_start",
+      "Bash(npm install:*)",
+      "Bash(cmd /c \"npx msw init public/ --save 2>&1\")",
+      "Bash(git -C \"E:\\\\HỌC DATA WITH NHILE\\\\NEDU WEBSITE\\\\claude md\" status)"
+    ]
+  }
+}
