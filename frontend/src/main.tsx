@@ -9,18 +9,18 @@ import { ToastProvider } from './shared/components/ui/Toast'
 import { ErrorBoundary } from './shared/components/ErrorBoundary'
 import './index.css'
 
+const USE_MOCKS =
+  import.meta.env.DEV || import.meta.env.VITE_USE_MOCKS === 'true'
+
 async function prepare() {
-  if (import.meta.env.DEV) {
+  if (USE_MOCKS) {
     try {
       const { worker } = await import('./mocks/browser')
       await worker.start({
         onUnhandledRequest: 'bypass',
-        serviceWorker: {
-          url: '/mockServiceWorker.js',
-        },
+        serviceWorker: { url: '/mockServiceWorker.js' },
       })
     } catch (e) {
-      // MSW service worker not yet initialized — fall through without mocks
       console.warn('[MSW] Service worker not available, skipping mocks:', e)
     }
   }
@@ -36,7 +36,7 @@ prepare().then(() => {
               <App />
             </ToastProvider>
           </BrowserRouter>
-          <ReactQueryDevtools initialIsOpen={false} />
+          {import.meta.env.DEV && <ReactQueryDevtools initialIsOpen={false} />}
         </QueryClientProvider>
       </ErrorBoundary>
     </React.StrictMode>,
