@@ -1,5 +1,4 @@
 import { ReactNode } from 'react'
-import { clsx } from 'clsx'
 
 interface EmptyStateAction {
   label: string
@@ -23,41 +22,41 @@ export function EmptyState({
 }: EmptyStateProps) {
   return (
     <div
-      className={clsx(
-        'flex flex-col items-center justify-center py-16 px-6 text-center',
-        className,
-      )}
+      className={className}
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '40px 24px',
+        textAlign: 'center',
+      }}
     >
-      {icon && (
-        <div className="mb-4 text-gray-300 [&_svg]:w-16 [&_svg]:h-16">{icon}</div>
-      )}
-      {!icon && (
-        <div className="mb-4 text-gray-300">
-          <svg
-            className="w-16 h-16 mx-auto"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            strokeWidth={1}
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"
-            />
-          </svg>
-        </div>
-      )}
-      <h3 className="text-lg font-semibold font-headline text-gray-700 mb-1">
+      <div style={{ fontSize: 40, marginBottom: 12, opacity: 0.5 }}>
+        {icon ?? '📭'}
+      </div>
+      <div style={{ fontSize: 14, fontWeight: 600, color: '#374151', marginBottom: 6 }}>
         {title}
-      </h3>
+      </div>
       {description && (
-        <p className="text-sm text-gray-500 font-body max-w-sm">{description}</p>
+        <div style={{ fontSize: 12, color: '#9ca3af', maxWidth: 280, lineHeight: 1.5 }}>
+          {description}
+        </div>
       )}
       {action && (
         <button
           onClick={action.onClick}
-          className="mt-4 inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-nedu-primary rounded-lg hover:bg-nedu-primary-600 transition-colors font-body"
+          style={{
+            marginTop: 14,
+            padding: '7px 14px',
+            background: 'linear-gradient(135deg,#2d9b6b,#22c575)',
+            color: '#fff',
+            border: 'none',
+            borderRadius: 8,
+            fontSize: 12,
+            fontWeight: 700,
+            cursor: 'pointer',
+          }}
         >
           {action.label}
         </button>

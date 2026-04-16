@@ -1,7 +1,12 @@
 import { ReactNode, useEffect } from 'react'
-import { clsx } from 'clsx'
 
 type ModalSize = 'sm' | 'md' | 'lg'
+
+const sizeMap: Record<ModalSize, number> = {
+  sm: 440,
+  md: 560,
+  lg: 720,
+}
 
 interface ModalProps {
   isOpen: boolean
@@ -11,19 +16,7 @@ interface ModalProps {
   size?: ModalSize
 }
 
-const sizeClasses: Record<ModalSize, string> = {
-  sm: 'max-w-md',
-  md: 'max-w-lg',
-  lg: 'max-w-2xl',
-}
-
-export function Modal({
-  isOpen,
-  onClose,
-  title,
-  children,
-  size = 'md',
-}: ModalProps) {
+export function Modal({ isOpen, onClose, title, children, size = 'md' }: ModalProps) {
   useEffect(() => {
     if (!isOpen) return
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -33,74 +26,93 @@ export function Modal({
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [isOpen, onClose])
 
-  // Lock body scroll when open
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden'
     } else {
       document.body.style.overflow = ''
     }
-    return () => {
-      document.body.style.overflow = ''
-    }
+    return () => { document.body.style.overflow = '' }
   }, [isOpen])
 
   if (!isOpen) return null
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      style={{
+        position: 'fixed',
+        inset: 0,
+        zIndex: 200,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: 16,
+      }}
       role="dialog"
       aria-modal="true"
       aria-labelledby={title ? 'modal-title' : undefined}
     >
       {/* Overlay */}
       <div
-        className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+        style={{
+          position: 'absolute',
+          inset: 0,
+          background: 'rgba(0,0,0,0.45)',
+          backdropFilter: 'blur(3px)',
+        }}
         onClick={onClose}
         aria-hidden="true"
       />
 
       {/* Panel */}
-      <div
-        className={clsx(
-          'relative bg-white rounded-xl shadow-2xl w-full flex flex-col max-h-[90vh]',
-          sizeClasses[size],
-        )}
-      >
+      <div style={{
+        position: 'relative',
+        background: '#fff',
+        borderRadius: 16,
+        boxShadow: '0 20px 60px rgba(0,0,0,0.2)',
+        width: '100%',
+        maxWidth: sizeMap[size],
+        maxHeight: '90vh',
+        display: 'flex',
+        flexDirection: 'column',
+        animation: 'fadeIn 0.15s ease-out',
+      }}>
         {/* Header */}
         {title && (
-          <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 shrink-0">
-            <h2
-              id="modal-title"
-              className="text-lg font-semibold font-headline text-gray-900"
-            >
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            padding: '14px 20px',
+            borderBottom: '1px solid rgba(0,0,0,0.09)',
+            flexShrink: 0,
+          }}>
+            <div id="modal-title" style={{ fontSize: 15, fontWeight: 700, color: '#111827' }}>
               {title}
-            </h2>
+            </div>
             <button
               onClick={onClose}
-              className="p-1 rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
+              style={{
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                color: '#9ca3af',
+                fontSize: 18,
+                padding: 4,
+                borderRadius: 6,
+                lineHeight: 1,
+              }}
               aria-label="Đóng"
             >
-              <svg
-                className="w-5 h-5"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={2}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
+              ✕
             </button>
           </div>
         )}
 
         {/* Body */}
-        <div className="px-6 py-4 overflow-y-auto">{children}</div>
+        <div style={{ padding: '16px 20px', overflowY: 'auto' }}>
+          {children}
+        </div>
       </div>
     </div>
   )

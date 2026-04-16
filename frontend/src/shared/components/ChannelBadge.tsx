@@ -12,11 +12,28 @@ interface ChannelBadgeProps {
 export function ChannelBadge({ channel, className }: ChannelBadgeProps) {
   return (
     <span
-      className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-700 font-body ${className ?? ''}`}
+      className={className}
+      style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: 5,
+        padding: '2px 8px',
+        borderRadius: 999,
+        fontSize: 11,
+        fontWeight: 600,
+        background: `${channel.color_hex}18`,
+        color: channel.color_hex,
+        border: `1px solid ${channel.color_hex}30`,
+      }}
     >
       <span
-        className="w-2 h-2 rounded-full shrink-0"
-        style={{ backgroundColor: channel.color_hex }}
+        style={{
+          width: 7,
+          height: 7,
+          borderRadius: '50%',
+          flexShrink: 0,
+          backgroundColor: channel.color_hex,
+        }}
         aria-hidden="true"
       />
       {channel.label}

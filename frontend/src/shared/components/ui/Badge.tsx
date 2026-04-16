@@ -1,7 +1,6 @@
 import { ReactNode } from 'react'
-import { clsx } from 'clsx'
 
-type BadgeVariant = 'green' | 'yellow' | 'red' | 'gray' | 'blue' | 'orange'
+type BadgeVariant = 'green' | 'yellow' | 'red' | 'gray' | 'blue' | 'orange' | 'purple'
 
 interface BadgeProps {
   variant?: BadgeVariant
@@ -9,23 +8,30 @@ interface BadgeProps {
   className?: string
 }
 
-const variantClasses: Record<BadgeVariant, string> = {
-  green: 'bg-green-100 text-green-800 ring-green-200',
-  yellow: 'bg-yellow-100 text-yellow-800 ring-yellow-200',
-  red: 'bg-red-100 text-red-800 ring-red-200',
-  gray: 'bg-gray-100 text-gray-700 ring-gray-200',
-  blue: 'bg-blue-100 text-blue-800 ring-blue-200',
-  orange: 'bg-orange-100 text-orange-800 ring-orange-200',
+const variantStyles: Record<BadgeVariant, React.CSSProperties> = {
+  green:  { background: 'rgba(45,155,107,0.1)',  color: '#1a5c46' },
+  yellow: { background: 'rgba(217,119,6,0.1)',   color: '#92400e' },
+  red:    { background: 'rgba(239,68,68,0.1)',   color: '#b91c1c' },
+  gray:   { background: 'rgba(0,0,0,0.06)',      color: '#374151' },
+  blue:   { background: 'rgba(37,99,235,0.1)',   color: '#1d4ed8' },
+  orange: { background: 'rgba(234,88,12,0.1)',   color: '#9a3412' },
+  purple: { background: 'rgba(124,58,237,0.1)',  color: '#5b21b6' },
 }
 
 export function Badge({ variant = 'gray', children, className }: BadgeProps) {
   return (
     <span
-      className={clsx(
-        'inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ring-1 ring-inset font-body',
-        variantClasses[variant],
-        className,
-      )}
+      className={className}
+      style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        padding: '2px 8px',
+        borderRadius: 999,
+        fontSize: 11,
+        fontWeight: 600,
+        lineHeight: 1.5,
+        ...variantStyles[variant],
+      }}
     >
       {children}
     </span>
