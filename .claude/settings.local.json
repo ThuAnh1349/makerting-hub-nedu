@@ -4,7 +4,8 @@
       "mcp__Claude_Preview__preview_start",
       "Bash(npm install:*)",
       "Bash(cmd /c \"npx msw init public/ --save 2>&1\")",
-      "Bash(git -C \"E:\\\\HỌC DATA WITH NHILE\\\\NEDU WEBSITE\\\\claude md\" status)"
+      "Bash(git -C \"E:\\\\HỌC DATA WITH NHILE\\\\NEDU WEBSITE\\\\claude md\" status)",
+      "mcp__Claude_in_Chrome__computer"
     ]
   }
 }
