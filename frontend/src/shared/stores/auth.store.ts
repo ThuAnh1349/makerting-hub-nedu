@@ -1,6 +1,4 @@
 import { create } from 'zustand'
-import { supabase } from '@/shared/config/supabase'
-import { apiClient } from '@/shared/config/api-client'
 
 interface AuthUser {
   id: string
@@ -20,10 +18,19 @@ interface AuthState {
   initialize: () => Promise<void>
 }
 
+// Demo user — marketing_leader có đủ quyền xem toàn bộ app
+const DEMO_USER: AuthUser = {
+  id: 'demo-user-001',
+  display_name: 'Thu Anh (Demo)',
+  avatar_url: null,
+  roles: ['marketing_leader'],
+}
+
 export const useAuthStore = create<AuthState>((set, get) => ({
-  user: null,
-  isLoading: true,
-  isAuthenticated: false,
+  // Auto-login ngay từ đầu — không cần màn hình đăng nhập
+  user: DEMO_USER,
+  isLoading: false,
+  isAuthenticated: true,
 
   hasRole: (role: string) => {
     const { user } = get()
@@ -36,48 +43,17 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     return roles.some((r) => user.roles.includes(r))
   },
 
-  login: async (email: string, password: string) => {
-    set({ isLoading: true })
-    try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      })
-      if (error) throw new Error(error.message)
-
-      const profile = await apiClient.get<AuthUser>(
-        '/v1/marketing/persons/me',
-      )
-      set({
-        user: profile,
-        isAuthenticated: true,
-        isLoading: false,
-      })
-    } catch (err) {
-      set({ isLoading: false })
-      throw err
-    }
+  login: async (_email: string, _password: string) => {
+    set({ user: DEMO_USER, isAuthenticated: true, isLoading: false })
   },
 
   logout: async () => {
-    await supabase.auth.signOut()
-    set({ user: null, isAuthenticated: false, isLoading: false })
+    // Demo mode — logout xong tự vào lại luôn
+    set({ user: DEMO_USER, isAuthenticated: true, isLoading: false })
   },
 
   initialize: async () => {
-    set({ isLoading: true })
-    try {
-      const { data } = await supabase.auth.getSession()
-      if (data.session) {
-        const profile = await apiClient.get<AuthUser>(
-          '/v1/marketing/persons/me',
-        )
-        set({ user: profile, isAuthenticated: true, isLoading: false })
-      } else {
-        set({ user: null, isAuthenticated: false, isLoading: false })
-      }
-    } catch {
-      set({ user: null, isAuthenticated: false, isLoading: false })
-    }
+    // Không cần khởi tạo — đã auto-login từ initial state
+    set({ user: DEMO_USER, isAuthenticated: true, isLoading: false })
   },
 }))
