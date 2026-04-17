@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
+import { useSearchParams } from 'react-router-dom'
 import { PageLayout } from '@/shared/components/PageLayout'
 import { Button } from '@/shared/components/ui/Button'
 import { Badge } from '@/shared/components/ui/Badge'
@@ -35,7 +36,15 @@ function filterBriefs(briefs: Brief[], tab: TabFilter): Brief[] {
   return briefs
 }
 
+const TYPE_CONFIG: Record<string, { label: string; emoji: string; color: string }> = {
+  design:        { label: 'Thiết kế',   emoji: '🎨', color: '#7C3AED' },
+  video_editing: { label: 'Dựng video', emoji: '🎬', color: '#ea580c' },
+}
+
 export function BriefPage() {
+  const [searchParams] = useSearchParams()
+  const typeFilter = searchParams.get('type') as 'design' | 'video_editing' | null
+
   const [tab, setTab] = useState<TabFilter>('all')
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [selectedBriefId, setSelectedBriefId] = useState<string | undefined>()
@@ -46,15 +55,27 @@ export function BriefPage() {
     refetchInterval: 30_000,
   })
 
-  const allBriefs = data?.data ?? []
+  // Lọc theo type từ URL param trước, rồi mới lọc theo tab
+  const allBriefs = (data?.data ?? []).filter(b =>
+    typeFilter ? b.brief_type_code === typeFilter : true
+  )
   const filtered = filterBriefs(allBriefs, tab)
+
+  const typeInfo = typeFilter ? TYPE_CONFIG[typeFilter] : null
+  const pageTitle = typeInfo ? `Đặt ${typeInfo.label}` : 'Đặt việc'
+  const pageSubtitle = typeInfo
+    ? `${typeInfo.emoji} Gửi yêu cầu ${typeInfo.label.toLowerCase()} cho team`
+    : 'Gửi yêu cầu Design & Editing cho team'
+
+  const briefType = (typeFilter ?? 'design') as 'design' | 'video_editing'
 
   function openCreate() { setSelectedBriefId(undefined); setDrawerOpen(true) }
   function openDetail(id: string) { setSelectedBriefId(id); setDrawerOpen(true) }
 
   return (
     <PageLayout
-      title="Đặt việc"
+      title={pageTitle}
+      subtitle={pageSubtitle}
       actions={<Button size="sm" onClick={openCreate}>+ Gửi brief mới</Button>}
     >
       {/* Tabs */}
@@ -114,6 +135,7 @@ export function BriefPage() {
         isOpen={drawerOpen}
         onClose={() => setDrawerOpen(false)}
         briefId={selectedBriefId}
+        defaultType={briefType}
       />
     </PageLayout>
   )

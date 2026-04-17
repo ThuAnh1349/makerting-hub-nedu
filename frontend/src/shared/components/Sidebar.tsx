@@ -1,4 +1,4 @@
-import { NavLink, useNavigate } from 'react-router-dom'
+import { NavLink, useNavigate, useLocation } from 'react-router-dom'
 import { useAuthStore } from '@/shared/stores/auth.store'
 import { useNotificationStore } from '@/shared/stores/notification.store'
 import { ROLES } from '@/shared/constants/roles'
@@ -61,7 +61,8 @@ const NAV_ENTRIES: NavEntry[] = [
   },
   { type: 'divider' },
   { type: 'section', label: 'Đặt việc' },
-  { type: 'item', label: 'Đặt Brief',      path: '/briefs',       emoji: '📋' },
+  { type: 'item', label: 'Đặt Design',     path: '/briefs?type=design',         emoji: '🎨' },
+  { type: 'item', label: 'Đặt Editing',    path: '/briefs?type=video_editing',  emoji: '🎬' },
 ]
 
 // ── Sidebar Component ─────────────────────────────────────────────────────────
@@ -70,6 +71,16 @@ export function Sidebar() {
   const { user, hasAnyRole, logout } = useAuthStore()
   const unreadCount = useNotificationStore((s) => s.unreadCount)
   const navigate = useNavigate()
+  const location = useLocation()
+
+  // Active check hỗ trợ cả query params (vd: /briefs?type=design)
+  function isNavActive(path: string) {
+    const [pathname, search] = path.split('?')
+    if (search) {
+      return location.pathname === pathname && location.search === `?${search}`
+    }
+    return location.pathname === pathname
+  }
 
   const handleLogout = async () => {
     await logout()
@@ -153,12 +164,13 @@ export function Sidebar() {
           if (entry.requiredRoles && !hasAnyRole(entry.requiredRoles)) return null
 
           const isInbox = entry.path === '/inbox'
+          const active = isNavActive(entry.path)
 
           return (
             <NavLink
               key={entry.path}
               to={entry.path}
-              style={({ isActive }) => ({
+              style={{
                 display: 'flex',
                 alignItems: 'center',
                 gap: 6,
@@ -168,14 +180,14 @@ export function Sidebar() {
                 cursor: 'pointer',
                 fontSize: 11,
                 fontWeight: 500,
-                color: isActive ? '#111827' : '#374151',
-                background: isActive ? 'rgba(45,155,107,0.1)' : 'transparent',
+                color: active ? '#111827' : '#374151',
+                background: active ? 'rgba(45,155,107,0.1)' : 'transparent',
                 textDecoration: 'none',
                 margin: '1px 4px',
                 transition: 'background 0.15s',
-              })}
+              }}
             >
-              {({ isActive }) => (
+              {() => (
                 <>
                   <div style={{
                     width: 30,
@@ -186,7 +198,7 @@ export function Sidebar() {
                     justifyContent: 'center',
                     fontSize: 16,
                     flexShrink: 0,
-                    background: isActive
+                    background: active
                       ? 'linear-gradient(135deg,#2d9b6b,#22c575)'
                       : '#f3f4f6',
                   }}>

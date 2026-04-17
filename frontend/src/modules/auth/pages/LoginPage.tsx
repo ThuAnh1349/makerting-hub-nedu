@@ -22,26 +22,54 @@ export function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
-      <div className="w-full max-w-md">
-        {/* Logo / Title */}
-        <div className="text-center mb-8">
-          <div className="w-14 h-14 bg-nedu-primary rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-md">
-            <span className="text-white text-2xl font-bold font-headline">N</span>
+    <div style={{
+      minHeight: '100vh',
+      background: '#F0F4F8',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: 16,
+    }}>
+      <div style={{ width: '100%', maxWidth: 400 }}>
+        {/* Logo */}
+        <div style={{ textAlign: 'center', marginBottom: 28 }}>
+          <div style={{
+            width: 52,
+            height: 52,
+            background: 'linear-gradient(135deg,#ea580c,#c83800)',
+            borderRadius: 14,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            margin: '0 auto 12px',
+            fontSize: 26,
+            boxShadow: '0 4px 12px rgba(234,88,12,0.3)',
+          }}>
+            📣
           </div>
-          <h1 className="font-headline text-3xl font-bold text-nedu-primary mb-1">
+          <div style={{ fontSize: 22, fontWeight: 700, color: '#111827', lineHeight: 1.2 }}>
             Marketing Hub
-          </h1>
-          <p className="text-gray-500 text-sm font-body">Nedu · space.nedu.vn</p>
+          </div>
+          <div style={{ fontSize: 12, color: '#6b7280', marginTop: 4 }}>
+            Nedu · space.nedu.vn · Phễu tầng 1
+          </div>
         </div>
 
         {/* Card */}
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
-          <h2 className="text-xl font-semibold font-headline text-gray-900 mb-6">Đăng nhập</h2>
+        <div style={{
+          background: '#fff',
+          borderRadius: 16,
+          border: '1px solid rgba(0,0,0,0.09)',
+          boxShadow: '0 4px 20px rgba(0,0,0,0.07)',
+          padding: 28,
+        }}>
+          <div style={{ fontSize: 16, fontWeight: 700, color: '#111827', marginBottom: 20 }}>
+            Đăng nhập
+          </div>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 font-body mb-1">
+              <label htmlFor="email" style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#374151', marginBottom: 5 }}>
                 Email
               </label>
               <input
@@ -51,13 +79,24 @@ export function LoginPage() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm font-body focus:outline-none focus:ring-2 focus:ring-nedu-primary focus:border-transparent transition"
+                style={{
+                  width: '100%',
+                  padding: '9px 12px',
+                  border: '1px solid rgba(0,0,0,0.15)',
+                  borderRadius: 9,
+                  fontSize: 13,
+                  color: '#111827',
+                  outline: 'none',
+                  boxSizing: 'border-box',
+                }}
                 placeholder="you@nedu.vn"
+                onFocus={e => (e.target.style.borderColor = '#2d9b6b')}
+                onBlur={e => (e.target.style.borderColor = 'rgba(0,0,0,0.15)')}
               />
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 font-body mb-1">
+              <label htmlFor="password" style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#374151', marginBottom: 5 }}>
                 Mật khẩu
               </label>
               <input
@@ -67,14 +106,32 @@ export function LoginPage() {
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm font-body focus:outline-none focus:ring-2 focus:ring-nedu-primary focus:border-transparent transition"
+                style={{
+                  width: '100%',
+                  padding: '9px 12px',
+                  border: '1px solid rgba(0,0,0,0.15)',
+                  borderRadius: 9,
+                  fontSize: 13,
+                  color: '#111827',
+                  outline: 'none',
+                  boxSizing: 'border-box',
+                }}
                 placeholder="••••••••"
+                onFocus={e => (e.target.style.borderColor = '#2d9b6b')}
+                onBlur={e => (e.target.style.borderColor = 'rgba(0,0,0,0.15)')}
               />
             </div>
 
             {error && (
-              <div className="bg-red-50 border border-red-200 rounded-lg px-4 py-3 text-sm text-red-700 font-body">
-                {error}
+              <div style={{
+                background: 'rgba(239,68,68,0.06)',
+                border: '1px solid rgba(239,68,68,0.2)',
+                borderRadius: 9,
+                padding: '9px 12px',
+                fontSize: 12,
+                color: '#b91c1c',
+              }}>
+                ⚠️ {error}
               </div>
             )}
 
@@ -83,20 +140,20 @@ export function LoginPage() {
               variant="primary"
               size="lg"
               isLoading={isLoading}
-              className="w-full"
+              style={{ width: '100%', justifyContent: 'center' }}
             >
               Đăng nhập
             </Button>
           </form>
 
-          <p className="text-center text-xs text-gray-400 font-body mt-5">
+          <div style={{ textAlign: 'center', fontSize: 11, color: '#9ca3af', marginTop: 16 }}>
             Chỉ dành cho thành viên nội bộ Nedu
-          </p>
+          </div>
         </div>
 
-        <p className="text-center text-xs text-gray-400 font-body mt-6">
+        <div style={{ textAlign: 'center', fontSize: 11, color: '#9ca3af', marginTop: 20 }}>
           © 2026 NhiLe Holdings · Nedu Marketing Hub
-        </p>
+        </div>
       </div>
     </div>
   )

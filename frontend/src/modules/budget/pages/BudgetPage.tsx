@@ -70,37 +70,38 @@ interface KPICardProps {
 
 function KPICard({ label, value, sub, accent = 'neutral', children }: KPICardProps) {
   const valueColor =
-    accent === 'red'
-      ? 'text-red-600'
-      : accent === 'green'
-      ? 'text-green-600'
-      : 'text-gray-900'
+    accent === 'red' ? '#ef4444' : accent === 'green' ? '#2d9b6b' : '#111827'
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-5 flex flex-col gap-2">
-      <p className="text-xs font-medium text-gray-500 font-body uppercase tracking-wide">{label}</p>
-      <p className={`text-2xl font-bold font-headline ${valueColor}`}>{value}</p>
-      {sub && <p className="text-xs text-gray-400 font-body">{sub}</p>}
+    <div style={{
+      background: '#fff',
+      borderRadius: 13,
+      border: '1px solid rgba(0,0,0,0.09)',
+      boxShadow: '0 1px 4px rgba(0,0,0,0.05)',
+      padding: 16,
+      display: 'flex',
+      flexDirection: 'column',
+      gap: 6,
+    }}>
+      <div style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', color: '#9ca3af' }}>{label}</div>
+      <div style={{ fontSize: 22, fontWeight: 700, color: valueColor, lineHeight: 1.2 }}>{value}</div>
+      {sub && <div style={{ fontSize: 11, color: '#9ca3af' }}>{sub}</div>}
       {children}
     </div>
   )
 }
 
-function ProgressBar({
-  pct,
-  warning,
-}: {
-  pct: number
-  warning?: boolean
-}) {
-  const color =
-    pct >= 80 || warning ? 'bg-red-500' : pct >= 60 ? 'bg-yellow-400' : 'bg-green-500'
+function ProgressBar({ pct, warning }: { pct: number; warning?: boolean }) {
+  const color = pct >= 80 || warning ? '#ef4444' : pct >= 60 ? '#d97706' : '#2d9b6b'
   return (
-    <div className="w-full bg-gray-100 rounded-full h-1.5 overflow-hidden">
-      <div
-        className={`h-1.5 rounded-full transition-all ${color}`}
-        style={{ width: `${Math.min(pct, 100)}%` }}
-      />
+    <div style={{ background: '#f3f4f6', borderRadius: 999, height: 5, overflow: 'hidden' }}>
+      <div style={{
+        height: 5,
+        borderRadius: 999,
+        width: `${Math.min(pct, 100)}%`,
+        background: color,
+        transition: 'width 0.3s',
+      }} />
     </div>
   )
 }
@@ -175,50 +176,62 @@ export function BudgetPage() {
         </Button>
       }
     >
-      <div className="space-y-6">
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
         {/* Month selector */}
-        <div className="flex items-center gap-3">
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <button
             onClick={() => setMonthIdx((i) => Math.max(0, i - 1))}
             disabled={monthIdx === 0}
-            className="p-1.5 rounded-md text-gray-500 hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+            style={{
+              background: 'none', border: '1px solid rgba(0,0,0,0.12)',
+              borderRadius: 7, padding: '4px 8px', cursor: monthIdx === 0 ? 'not-allowed' : 'pointer',
+              color: '#374151', fontSize: 14, opacity: monthIdx === 0 ? 0.3 : 1,
+            }}
             aria-label="Tháng trước"
           >
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-            </svg>
+            ‹
           </button>
-          <span className="text-sm font-semibold text-gray-800 font-body min-w-[110px] text-center">
+          <span style={{ fontSize: 13, fontWeight: 700, color: '#111827', minWidth: 120, textAlign: 'center' }}>
             {selectedMonth.label}
           </span>
           <button
             onClick={() => setMonthIdx((i) => Math.min(MONTHS.length - 1, i + 1))}
             disabled={monthIdx === MONTHS.length - 1}
-            className="p-1.5 rounded-md text-gray-500 hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+            style={{
+              background: 'none', border: '1px solid rgba(0,0,0,0.12)',
+              borderRadius: 7, padding: '4px 8px', cursor: monthIdx === MONTHS.length - 1 ? 'not-allowed' : 'pointer',
+              color: '#374151', fontSize: 14, opacity: monthIdx === MONTHS.length - 1 ? 0.3 : 1,
+            }}
             aria-label="Tháng sau"
           >
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-            </svg>
+            ›
           </button>
         </div>
 
         {/* Budget warning banner */}
         {summary?.budget_warning && (
-          <div className="flex items-center gap-3 bg-red-50 border border-red-200 rounded-xl px-4 py-3">
-            <span className="text-lg">⚠️</span>
-            <p className="text-sm font-medium text-red-700 font-body">
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 10,
+            background: 'rgba(239,68,68,0.06)',
+            border: '1px solid rgba(239,68,68,0.2)',
+            borderRadius: 11,
+            padding: '10px 14px',
+          }}>
+            <span style={{ fontSize: 16 }}>⚠️</span>
+            <span style={{ fontSize: 12, fontWeight: 600, color: '#b91c1c' }}>
               Đã dùng {Math.round(summary.budget_used_pct)}% ngân sách tháng này.
               Hãy kiểm tra và điều chỉnh phân bổ.
-            </p>
+            </span>
           </div>
         )}
 
         {/* KPI cards */}
         {isLoading && (
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 10 }}>
             {[0, 1, 2].map((i) => (
-              <div key={i} className="bg-white rounded-xl border border-gray-200 p-5">
+              <div key={i} style={{ background: '#fff', borderRadius: 13, padding: 16, border: '1px solid rgba(0,0,0,0.09)' }}>
                 <Skeleton variant="line" lines={3} />
               </div>
             ))}
@@ -234,7 +247,7 @@ export function BudgetPage() {
 
         {summary && !isLoading && (
           <>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 10 }}>
               {/* KPI 1: Total budget */}
               <KPICard
                 label="Tổng ngân sách"
@@ -273,12 +286,18 @@ export function BudgetPage() {
             </div>
 
             {/* CPL comparison table */}
-            <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-              <div className="px-5 py-4 border-b border-gray-100">
-                <h2 className="text-base font-semibold font-headline text-gray-900">
-                  CPL theo kênh
-                </h2>
-                <p className="text-xs text-gray-400 font-body mt-0.5">Sắp xếp theo CPL thực tế tăng dần</p>
+            <div style={{
+              background: '#fff',
+              borderRadius: 13,
+              border: '1px solid rgba(0,0,0,0.09)',
+              boxShadow: '0 1px 4px rgba(0,0,0,0.05)',
+              overflow: 'hidden',
+            }}>
+              <div style={{ padding: '12px 16px', borderBottom: '1px solid rgba(0,0,0,0.07)' }}>
+                <div style={{ fontSize: 14, fontWeight: 700, color: '#111827' }}>
+                  💰 CPL theo kênh
+                </div>
+                <div style={{ fontSize: 11, color: '#9ca3af', marginTop: 2 }}>Sắp xếp theo CPL thực tế tăng dần</div>
               </div>
 
               {/* Table header */}

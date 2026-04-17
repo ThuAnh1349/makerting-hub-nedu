@@ -1,7 +1,6 @@
 import { useState, useEffect, useMemo } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { useQueryClient } from '@tanstack/react-query'
-import { clsx } from 'clsx'
 import { PageLayout } from '@/shared/components/PageLayout'
 import { EmptyState } from '@/shared/components/ui/EmptyState'
 import { useToast } from '@/shared/components/ui/Toast'
@@ -15,42 +14,27 @@ import { ChannelBadge } from '@/shared/components/ChannelBadge'
 import { Skeleton } from '@/shared/components/ui/Skeleton'
 import type { LeadStatus, Lead } from '../inbox.types'
 
-// ── Filter configuration ──────────────────────────────────────────────────────
+// ── Filter config ─────────────────────────────────────────────────────────────
 
-type FilterId =
-  | 'all'
-  | 'hot'
-  | 'warm'
-  | 'cold'
-  | 'trash'
-  | 'pushed'
-  | 'returned'
+type FilterId = 'all' | 'hot' | 'warm' | 'cold' | 'trash' | 'pushed' | 'returned'
 
 interface FilterChip {
   id: FilterId
   label: string
   statuses: LeadStatus[]
+  color: string
+  activeColor: string
 }
 
 const FILTER_CHIPS: FilterChip[] = [
-  { id: 'all', label: 'Tất cả', statuses: [] },
-  { id: 'hot', label: 'Hot', statuses: ['hot'] },
-  { id: 'warm', label: 'Warm', statuses: ['warm'] },
-  { id: 'cold', label: 'Cold', statuses: ['cold'] },
-  { id: 'trash', label: 'Rác', statuses: ['new'] },
-  { id: 'pushed', label: 'Đã push', statuses: ['pushed'] },
-  { id: 'returned', label: 'Trả về', statuses: ['returned'] },
+  { id: 'all',      label: 'Tất cả',  statuses: [],          color: '#374151', activeColor: '#111827' },
+  { id: 'hot',      label: '🔥 Hot',  statuses: ['hot'],     color: '#b91c1c', activeColor: '#ef4444' },
+  { id: 'warm',     label: '☀️ Warm', statuses: ['warm'],    color: '#92400e', activeColor: '#d97706' },
+  { id: 'cold',     label: '❄️ Cold', statuses: ['cold'],    color: '#1d4ed8', activeColor: '#2563eb' },
+  { id: 'pushed',   label: '✅ Đã push', statuses: ['pushed'], color: '#1a5c46', activeColor: '#2d9b6b' },
+  { id: 'returned', label: '↩ Trả về', statuses: ['returned'], color: '#9a3412', activeColor: '#ea580c' },
+  { id: 'trash',    label: '🗑 Rác',  statuses: ['new'],     color: '#6b7280', activeColor: '#4b5563' },
 ]
-
-const CHIP_ACTIVE_CLASSES: Record<FilterId, string> = {
-  all: 'bg-gray-800 text-white border-gray-800',
-  hot: 'bg-red-600 text-white border-red-600',
-  warm: 'bg-yellow-500 text-white border-yellow-500',
-  cold: 'bg-blue-500 text-white border-blue-500',
-  trash: 'bg-gray-500 text-white border-gray-500',
-  pushed: 'bg-green-600 text-white border-green-600',
-  returned: 'bg-orange-500 text-white border-orange-500',
-}
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -64,7 +48,7 @@ function formatTimeAgo(iso: string): string {
   return `${Math.floor(hours / 24)} ngày trước`
 }
 
-// ── Inline Lead Detail Panel (used on desktop) ────────────────────────────────
+// ── Inline Lead Detail ────────────────────────────────────────────────────────
 
 interface InlineLeadDetailProps {
   lead: Lead
@@ -74,127 +58,103 @@ interface InlineLeadDetailProps {
 
 function InlineLeadDetail({ lead, onAction, isActioning }: InlineLeadDetailProps) {
   return (
-    <div className="flex flex-col h-full overflow-y-auto p-6 space-y-5">
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', overflowY: 'auto' }}>
       {/* Returned banner */}
       {lead.current_status === 'returned' && lead.return_reason && (
-        <ReturnedLeadBanner reason={lead.return_reason} />
+        <div style={{ padding: '0 16px', paddingTop: 14 }}>
+          <ReturnedLeadBanner reason={lead.return_reason} />
+        </div>
       )}
 
-      {/* Basic info */}
-      <div className="bg-gray-50 rounded-xl border border-gray-200 p-4 space-y-3">
-        <div>
-          <p className="text-xs text-gray-400 font-body">Họ và tên</p>
-          <p className="text-base font-semibold text-gray-900 font-headline mt-0.5">
+      {/* Basic info card */}
+      <div style={{ padding: '14px 16px 0' }}>
+        <div style={{
+          background: '#f9fafb',
+          borderRadius: 11,
+          border: '1px solid rgba(0,0,0,0.07)',
+          padding: 14,
+        }}>
+          <div style={{ fontSize: 16, fontWeight: 700, color: '#111827', marginBottom: 10 }}>
             {lead.full_name}
-          </p>
-        </div>
-        <div>
-          <p className="text-xs text-gray-400 font-body">Số điện thoại</p>
-          <p className="text-sm text-gray-900 font-body mt-0.5">{lead.phone_number}</p>
-        </div>
-        <div>
-          <p className="text-xs text-gray-400 font-body mb-1">Kênh</p>
-          <ChannelBadge channel={lead.channel} />
-        </div>
-        {lead.assigned_to && (
-          <div>
-            <p className="text-xs text-gray-400 font-body">Phụ trách</p>
-            <div className="flex items-center gap-2 mt-1">
-              {lead.assigned_to.avatar_url ? (
-                <img
-                  src={lead.assigned_to.avatar_url}
-                  alt=""
-                  className="w-6 h-6 rounded-full object-cover shrink-0"
-                />
-              ) : (
-                <span className="w-6 h-6 rounded-full bg-gray-200 flex items-center justify-center text-xs text-gray-500 shrink-0">
-                  {lead.assigned_to.display_name.charAt(0)}
-                </span>
-              )}
-              <span className="text-sm text-gray-800 font-body">
-                {lead.assigned_to.display_name}
-              </span>
-            </div>
           </div>
-        )}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, fontSize: 12 }}>
+            <div>
+              <div style={{ color: '#9ca3af', marginBottom: 2 }}>Số điện thoại</div>
+              <div style={{ color: '#111827', fontWeight: 600 }}>{lead.phone_number}</div>
+            </div>
+            <div>
+              <div style={{ color: '#9ca3af', marginBottom: 2 }}>Kênh</div>
+              <ChannelBadge channel={lead.channel} />
+            </div>
+            {lead.utm_source && (
+              <div>
+                <div style={{ color: '#9ca3af', marginBottom: 2 }}>utm_source</div>
+                <div style={{ color: '#374151', fontWeight: 500 }}>{lead.utm_source}</div>
+              </div>
+            )}
+            {lead.utm_campaign && (
+              <div>
+                <div style={{ color: '#9ca3af', marginBottom: 2 }}>utm_campaign</div>
+                <div style={{ color: '#374151', fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{lead.utm_campaign}</div>
+              </div>
+            )}
+          </div>
+          {lead.assigned_to && (
+            <div style={{ marginTop: 10, paddingTop: 10, borderTop: '1px solid rgba(0,0,0,0.07)', display: 'flex', alignItems: 'center', gap: 8, fontSize: 12 }}>
+              <div style={{ color: '#9ca3af' }}>Phụ trách:</div>
+              <div style={{ color: '#111827', fontWeight: 600 }}>{lead.assigned_to.display_name}</div>
+            </div>
+          )}
+        </div>
       </div>
 
-      {/* Message + UTM */}
-      <div className="space-y-3">
-        {lead.message_preview && (
-          <div>
-            <p className="text-xs text-gray-400 font-body mb-1">Tin nhắn</p>
-            <p className="text-sm text-gray-700 font-body bg-gray-50 rounded-lg p-3 border border-gray-200 italic">
-              &ldquo;{lead.message_preview}&rdquo;
-            </p>
+      {/* Message preview */}
+      {lead.message_preview && (
+        <div style={{ padding: '10px 16px 0' }}>
+          <div style={{ fontSize: 11, color: '#9ca3af', marginBottom: 4 }}>Tin nhắn</div>
+          <div style={{
+            background: '#fff',
+            border: '1px solid rgba(0,0,0,0.09)',
+            borderRadius: 9,
+            padding: '10px 12px',
+            fontSize: 12,
+            color: '#374151',
+            fontStyle: 'italic',
+            lineHeight: 1.5,
+          }}>
+            "{lead.message_preview}"
           </div>
-        )}
-        <div className="grid grid-cols-2 gap-2 text-xs">
-          <div>
-            <p className="text-gray-400 font-body">utm_source</p>
-            <p className="text-gray-700 font-body font-medium truncate">
-              {lead.utm_source || '—'}
-            </p>
-          </div>
-          {lead.utm_medium && (
-            <div>
-              <p className="text-gray-400 font-body">utm_medium</p>
-              <p className="text-gray-700 font-body font-medium truncate">
-                {lead.utm_medium}
-              </p>
-            </div>
-          )}
-          {lead.utm_campaign && (
-            <div className="col-span-2">
-              <p className="text-gray-400 font-body">utm_campaign</p>
-              <p className="text-gray-700 font-body font-medium truncate">
-                {lead.utm_campaign}
-              </p>
-            </div>
-          )}
         </div>
-        <p className="text-xs text-gray-400 font-body">
-          Đồng bộ lần cuối: {formatTimeAgo(lead.ops_synced_at)}
-        </p>
+      )}
+
+      {/* Sync time */}
+      <div style={{ padding: '6px 16px 0', fontSize: 10, color: '#9ca3af' }}>
+        Đồng bộ: {formatTimeAgo(lead.ops_synced_at)}
       </div>
 
       {/* Classify panel */}
-      <div className="border-t border-gray-200 pt-4">
-        <LeadClassifyPanel
-          lead={lead}
-          onAction={onAction}
-          isLoading={isActioning}
-        />
+      <div style={{ padding: '14px 16px 0', borderTop: '1px solid rgba(0,0,0,0.07)', marginTop: 10 }}>
+        <LeadClassifyPanel lead={lead} onAction={onAction} isLoading={isActioning} />
       </div>
 
       {/* Action history */}
       {lead.action_history && lead.action_history.length > 0 && (
-        <div className="border-t border-gray-200 pt-4">
-          <h3 className="text-sm font-semibold font-headline text-gray-800 mb-3">
-            Lịch sử hoạt động
-          </h3>
-          <div className="space-y-3">
+        <div style={{ padding: '14px 16px', borderTop: '1px solid rgba(0,0,0,0.07)', marginTop: 10 }}>
+          <div style={{ fontSize: 12, fontWeight: 700, color: '#374151', marginBottom: 10 }}>Lịch sử hoạt động</div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             {[...lead.action_history]
-              .sort(
-                (a, b) =>
-                  new Date(a.created_at).getTime() -
-                  new Date(b.created_at).getTime(),
-              )
+              .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
               .map((event, i) => (
-                <div key={i} className="flex gap-2 items-start text-xs">
-                  <span className="shrink-0 w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center text-sm">
-                    📝
-                  </span>
+                <div key={i} style={{ display: 'flex', gap: 8, alignItems: 'flex-start', fontSize: 11 }}>
+                  <span style={{
+                    width: 24, height: 24, borderRadius: '50%', background: '#f3f4f6',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    flexShrink: 0, fontSize: 13,
+                  }}>📝</span>
                   <div>
-                    <p className="text-gray-700 font-body font-medium">
-                      {event.event_type.replace(/_/g, ' ')}
-                    </p>
-                    {event.actor_name && (
-                      <p className="text-gray-400 font-body">{event.actor_name}</p>
-                    )}
-                    <p className="text-gray-400 font-body">
-                      {new Date(event.created_at).toLocaleString('vi-VN')}
-                    </p>
+                    <div style={{ color: '#374151', fontWeight: 600 }}>{event.event_type.replace(/_/g, ' ')}</div>
+                    {event.actor_name && <div style={{ color: '#9ca3af' }}>{event.actor_name}</div>}
+                    <div style={{ color: '#9ca3af' }}>{new Date(event.created_at).toLocaleString('vi-VN')}</div>
                   </div>
                 </div>
               ))}
@@ -215,10 +175,8 @@ export function InboxPage() {
   const [activeFilter, setActiveFilter] = useState<FilterId>('all')
   const [selectedLeadId, setSelectedLeadId] = useState<string | null>(null)
   const [isActioning, setIsActioning] = useState(false)
-  // Mobile drawer state
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false)
 
-  // Respect ?lead_id= URL param on mount
   useEffect(() => {
     const paramLeadId = searchParams.get('lead_id')
     if (paramLeadId) {
@@ -228,29 +186,14 @@ export function InboxPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  // Build filter for API
   const currentChip = FILTER_CHIPS.find((c) => c.id === activeFilter)!
-  const apiFilter =
-    currentChip.statuses.length > 0
-      ? { status: currentChip.statuses }
-      : undefined
+  const apiFilter = currentChip.statuses.length > 0 ? { status: currentChip.statuses } : undefined
 
   const { data, isLoading } = useInboxLeads(apiFilter)
   const leads = data?.data ?? []
 
-  // Count per status for badge display
   const countByFilter = useMemo(() => {
-    const counts: Record<FilterId, number> = {
-      all: 0,
-      hot: 0,
-      warm: 0,
-      cold: 0,
-      trash: 0,
-      pushed: 0,
-      returned: 0,
-    }
-    // We need full data for counts — re-fetch without filter for counts
-    // We approximate using current loaded leads for now
+    const counts: Record<FilterId, number> = { all: 0, hot: 0, warm: 0, cold: 0, trash: 0, pushed: 0, returned: 0 }
     leads.forEach((lead) => {
       counts.all++
       if (lead.current_status === 'hot') counts.hot++
@@ -263,13 +206,11 @@ export function InboxPage() {
     return counts
   }, [leads])
 
-  // Find selected lead object from loaded list
   const selectedLead = leads.find((l) => l.id === selectedLeadId) ?? null
 
   function handleSelectLead(id: string) {
     setSelectedLeadId(id)
     setMobileDrawerOpen(true)
-    // Update URL param without re-mount
     setSearchParams((prev) => {
       const next = new URLSearchParams(prev)
       next.set('lead_id', id)
@@ -287,11 +228,7 @@ export function InboxPage() {
     })
   }
 
-  async function handleAction(
-    action: string,
-    _classification?: string,
-    reason?: string,
-  ) {
+  async function handleAction(action: string, _classification?: string, reason?: string) {
     if (!selectedLeadId) return
     setIsActioning(true)
     try {
@@ -311,42 +248,61 @@ export function InboxPage() {
   }
 
   return (
-    <PageLayout title="Inbox & Lead">
-      <div className="flex flex-col h-[calc(100vh-120px)] -mx-4 sm:-mx-6 lg:-mx-8">
-        {/* Filter bar */}
-        <div className="px-4 sm:px-6 lg:px-8 py-3 border-b border-gray-200 bg-white shrink-0">
-          <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
+    <PageLayout title="Inbox & Lead" noHeader>
+      {/* Full-height panel matching HTML .ill layout */}
+      <div style={{
+        display: 'flex',
+        flexDirection: 'column',
+        height: 'calc(100vh - 44px)',
+        margin: -20,
+        background: '#fff',
+      }}>
+        {/* Page header */}
+        <div style={{
+          height: 52,
+          borderBottom: '1px solid rgba(0,0,0,0.09)',
+          display: 'flex',
+          alignItems: 'center',
+          padding: '0 20px',
+          gap: 12,
+          flexShrink: 0,
+        }}>
+          <div style={{ fontSize: 15, fontWeight: 700, color: '#111827', flex: 1 }}>
+            📩 Inbox & Lead
+          </div>
+          {/* Status pills */}
+          <div style={{ display: 'flex', gap: 6 }}>
             {FILTER_CHIPS.map((chip) => {
               const isActive = activeFilter === chip.id
-              const count = isLoading ? null : countByFilter[chip.id]
-
+              const count = countByFilter[chip.id]
               return (
                 <button
                   key={chip.id}
-                  onClick={() => {
-                    setActiveFilter(chip.id)
-                    setSelectedLeadId(null)
-                    setMobileDrawerOpen(false)
+                  onClick={() => { setActiveFilter(chip.id); setSelectedLeadId(null) }}
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 4,
+                    padding: '3px 10px',
+                    borderRadius: 999,
+                    fontSize: 11,
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    border: isActive ? 'none' : '1px solid rgba(0,0,0,0.12)',
+                    background: isActive ? chip.activeColor : 'transparent',
+                    color: isActive ? '#fff' : chip.color,
+                    transition: 'all 0.15s',
                   }}
-                  className={clsx(
-                    'shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium font-body border transition-colors',
-                    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:ring-gray-400',
-                    isActive
-                      ? CHIP_ACTIVE_CLASSES[chip.id]
-                      : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-50',
-                  )}
-                  aria-pressed={isActive}
                 >
                   {chip.label}
-                  {count !== null && count > 0 && (
-                    <span
-                      className={clsx(
-                        'inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 rounded-full text-xs font-bold',
-                        isActive
-                          ? 'bg-white/30 text-white'
-                          : 'bg-gray-100 text-gray-600',
-                      )}
-                    >
+                  {!isLoading && count > 0 && (
+                    <span style={{
+                      background: isActive ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.08)',
+                      borderRadius: 999,
+                      padding: '0 5px',
+                      fontSize: 10,
+                      fontWeight: 700,
+                    }}>
                       {count}
                     </span>
                   )}
@@ -356,16 +312,16 @@ export function InboxPage() {
           </div>
         </div>
 
-        {/* Main split panel */}
-        <div className="flex flex-1 min-h-0">
-          {/* Lead list — fixed width on desktop, full width on mobile */}
-          <div
-            className={clsx(
-              'shrink-0 border-r border-gray-200 bg-gray-50 overflow-y-auto',
-              // On mobile, hide list when drawer is open
-              'w-full md:w-96',
-              mobileDrawerOpen && selectedLeadId ? 'hidden md:block' : 'block',
-            )}
+        {/* Split panel — matches HTML .ill (2-column grid) */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', flex: 1, minHeight: 0 }}>
+          {/* Left: Inbox list */}
+          <div style={{
+            borderRight: '1px solid rgba(0,0,0,0.09)',
+            overflowY: 'auto',
+            background: '#f9fafb',
+            display: mobileDrawerOpen && selectedLeadId ? 'none' : 'block',
+          }}
+            className="md:block"
           >
             <InboxList
               leads={leads}
@@ -375,54 +331,63 @@ export function InboxPage() {
             />
           </div>
 
-          {/* Detail panel — desktop inline, mobile as drawer */}
-          {/* Desktop detail panel */}
-          <div className="hidden md:flex flex-1 min-h-0 overflow-hidden">
+          {/* Right: Lead detail */}
+          <div style={{ overflowY: 'auto', background: '#fff' }}>
             {selectedLead ? (
-              <div className="flex-1 overflow-y-auto bg-white">
+              <>
                 {/* Detail header */}
-                <div className="sticky top-0 z-10 bg-white border-b border-gray-200 px-6 py-3 flex items-center justify-between">
-                  <h2 className="text-base font-semibold font-headline text-gray-900 truncate">
+                <div style={{
+                  position: 'sticky',
+                  top: 0,
+                  zIndex: 10,
+                  background: '#fff',
+                  borderBottom: '1px solid rgba(0,0,0,0.07)',
+                  padding: '10px 16px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                }}>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: '#111827', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                     {selectedLead.full_name}
-                  </h2>
+                  </div>
                   <button
                     onClick={handleCloseDrawer}
-                    className="p-1 rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
-                    aria-label="Đóng"
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      cursor: 'pointer',
+                      color: '#9ca3af',
+                      fontSize: 18,
+                      padding: 4,
+                      borderRadius: 6,
+                    }}
                   >
-                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
+                    ✕
                   </button>
                 </div>
-                <InlineLeadDetail
-                  lead={selectedLead}
-                  onAction={handleAction}
-                  isActioning={isActioning}
-                />
-              </div>
+                <InlineLeadDetail lead={selectedLead} onAction={handleAction} isActioning={isActioning} />
+              </>
             ) : isLoading ? (
-              <div className="flex-1 p-6 space-y-4">
+              <div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 12 }}>
                 <Skeleton variant="card" />
                 <Skeleton variant="line" lines={4} />
               </div>
             ) : (
-              <div className="flex-1 flex items-center justify-center">
-                <EmptyState
-                  title="Chọn một lead để xem chi tiết"
-                  description="Nhấp vào một lead từ danh sách bên trái để xem thông tin và phân loại."
-                />
-              </div>
+              <EmptyState
+                title="Chọn một lead để xem chi tiết"
+                description="Nhấp vào một lead từ danh sách bên trái để xem thông tin và phân loại."
+                icon="👈"
+              />
             )}
           </div>
+        </div>
 
-          {/* Mobile: full-screen slide-in detail using Drawer component */}
-          <div className="md:hidden">
-            <LeadDetailDrawer
-              leadId={mobileDrawerOpen ? selectedLeadId : null}
-              onClose={handleCloseDrawer}
-            />
-          </div>
+        {/* Mobile drawer */}
+        <div className="md:hidden">
+          <LeadDetailDrawer
+            leadId={mobileDrawerOpen ? selectedLeadId : null}
+            onClose={handleCloseDrawer}
+          />
         </div>
       </div>
     </PageLayout>

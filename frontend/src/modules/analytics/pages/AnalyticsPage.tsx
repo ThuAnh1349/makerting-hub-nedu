@@ -82,76 +82,78 @@ function KpiCard({ channel }: { channel: AnalyticsByChannel }) {
   const budgetDanger = budgetPct >= 80
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-5 space-y-4 shadow-sm">
+    <div style={{
+      background: '#fff',
+      borderRadius: 13,
+      border: '1px solid rgba(0,0,0,0.09)',
+      boxShadow: '0 1px 4px rgba(0,0,0,0.05)',
+      padding: 14,
+    }}>
       {/* Channel header */}
-      <div className="flex items-center gap-2">
+      <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 12 }}>
         <span
-          className="w-3 h-3 rounded-full shrink-0"
-          style={{ backgroundColor: channel.channel_color || '#6B7280' }}
+          style={{
+            width: 10, height: 10, borderRadius: '50%', flexShrink: 0,
+            backgroundColor: channel.channel_color || '#6B7280',
+          }}
         />
-        <span className="font-semibold text-gray-900 font-headline text-sm">
+        <span style={{ fontWeight: 700, color: '#111827', fontSize: 13, flex: 1 }}>
           {channel.channel_label}
         </span>
-        <span className="ml-auto">
-          <Badge variant="gray" className="text-xs capitalize">
-            {channel.data_source.replace(/_/g, ' ')}
-          </Badge>
-        </span>
+        <Badge variant="gray">
+          {channel.data_source.replace(/_/g, ' ')}
+        </Badge>
       </div>
 
       {/* KPI grid */}
-      <div className="grid grid-cols-2 gap-3 text-sm">
-        <div>
-          <p className="text-gray-500 text-xs mb-0.5">Reach</p>
-          <p className="font-semibold text-gray-800">{formatReach(channel.reach)}</p>
-        </div>
-        <div>
-          <p className="text-gray-500 text-xs mb-0.5">Engagement Rate</p>
-          <p className={`font-semibold ${erColor(channel.engagement_rate_pct)}`}>
-            {channel.engagement_rate_pct !== null
-              ? `${channel.engagement_rate_pct.toFixed(1)}%`
-              : '—'}
-          </p>
-        </div>
-        <div>
-          <p className="text-gray-500 text-xs mb-0.5">Lead</p>
-          <p className="font-semibold text-gray-800">
-            {channel.lead_count !== null ? channel.lead_count.toLocaleString() : '—'}
-          </p>
-        </div>
-        <div>
-          <p className="text-gray-500 text-xs mb-0.5">CPL</p>
-          <p
-            className={`font-semibold ${
-              channel.cpl_actual !== null &&
-              channel.cpl_benchmark !== null &&
-              channel.cpl_actual > channel.cpl_benchmark
-                ? 'text-red-600'
-                : 'text-gray-800'
-            }`}
-          >
-            {formatVnd(channel.cpl_actual)}
-            {channel.cpl_benchmark !== null && (
-              <span className="text-gray-400 text-xs font-normal ml-1">
-                / {formatVnd(channel.cpl_benchmark)}
-              </span>
-            )}
-          </p>
-        </div>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 12 }}>
+        {[
+          { label: 'Reach', value: formatReach(channel.reach), color: undefined },
+          {
+            label: 'ER%',
+            value: channel.engagement_rate_pct !== null ? `${channel.engagement_rate_pct.toFixed(1)}%` : '—',
+            color: channel.engagement_rate_pct !== null
+              ? channel.engagement_rate_pct >= 3 ? '#16a34a' : channel.engagement_rate_pct >= 1 ? '#d97706' : '#ef4444'
+              : undefined,
+          },
+          {
+            label: 'Lead',
+            value: channel.lead_count !== null ? channel.lead_count.toLocaleString() : '—',
+            color: undefined,
+          },
+          {
+            label: 'CPL',
+            value: formatVnd(channel.cpl_actual),
+            color: channel.cpl_actual !== null && channel.cpl_benchmark !== null && channel.cpl_actual > channel.cpl_benchmark
+              ? '#ef4444' : '#111827',
+          },
+        ].map((item) => (
+          <div key={item.label}>
+            <div style={{ fontSize: 10, color: '#9ca3af', marginBottom: 2 }}>{item.label}</div>
+            <div style={{ fontSize: 15, fontWeight: 700, color: item.color ?? '#111827', lineHeight: 1.2 }}>
+              {item.value}
+            </div>
+          </div>
+        ))}
       </div>
 
       {/* Budget bar */}
       <div>
-        <div className="flex justify-between text-xs text-gray-500 mb-1">
-          <span>Ngân sách dùng</span>
-          <span className={budgetDanger ? 'text-red-600 font-semibold' : ''}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10, color: budgetDanger ? '#ef4444' : '#9ca3af', marginBottom: 4 }}>
+          <span>Ngân sách đã dùng</span>
+          <span style={{ fontWeight: budgetDanger ? 700 : 400 }}>
             {channel.budget_used_pct !== null ? `${channel.budget_used_pct.toFixed(0)}%` : '—'}
           </span>
         </div>
-        <div className="w-full bg-gray-100 rounded-full h-2">
+        <div style={{ background: '#f3f4f6', borderRadius: 999, height: 5, overflow: 'hidden' }}>
           <div
-            className={`h-2 rounded-full transition-all ${budgetDanger ? 'bg-red-500' : 'bg-green-500'}`}
-            style={{ width: `${Math.min(budgetPct, 100)}%` }}
+            style={{
+              height: 5,
+              borderRadius: 999,
+              width: `${Math.min(budgetPct, 100)}%`,
+              background: budgetDanger ? '#ef4444' : '#2d9b6b',
+              transition: 'width 0.3s',
+            }}
           />
         </div>
       </div>
@@ -207,16 +209,31 @@ export function AnalyticsPage() {
       }
     >
       {/* Period tabs */}
-      <div className="flex gap-1 mb-6 bg-gray-100 rounded-lg p-1 w-fit">
+      <div style={{
+        display: 'flex',
+        gap: 4,
+        marginBottom: 20,
+        background: 'rgba(0,0,0,0.05)',
+        borderRadius: 10,
+        padding: 4,
+        width: 'fit-content',
+      }}>
         {TABS.map((tab) => (
           <button
             key={tab.key}
             onClick={() => setActiveTab(tab.key)}
-            className={`px-4 py-1.5 rounded-md text-sm font-medium font-body transition-colors ${
-              activeTab === tab.key
-                ? 'bg-white text-gray-900 shadow-sm'
-                : 'text-gray-500 hover:text-gray-700'
-            }`}
+            style={{
+              padding: '5px 14px',
+              borderRadius: 7,
+              fontSize: 12,
+              fontWeight: 600,
+              border: 'none',
+              cursor: 'pointer',
+              transition: 'all 0.15s',
+              background: activeTab === tab.key ? '#fff' : 'transparent',
+              color: activeTab === tab.key ? '#111827' : '#6b7280',
+              boxShadow: activeTab === tab.key ? '0 1px 4px rgba(0,0,0,0.1)' : 'none',
+            }}
           >
             {tab.label}
           </button>
@@ -224,7 +241,7 @@ export function AnalyticsPage() {
       </div>
 
       {isLoading ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 10 }}>
           {Array.from({ length: 4 }).map((_, i) => (
             <Skeleton key={i} variant="card" />
           ))}
@@ -235,7 +252,7 @@ export function AnalyticsPage() {
           description="Không có dữ liệu analytics cho kỳ này."
         />
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(220px,1fr))', gap: 10 }}>
           {channels.map((ch) => (
             <KpiCard key={ch.channel_id} channel={ch} />
           ))}
