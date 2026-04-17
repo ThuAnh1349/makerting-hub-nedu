@@ -85,11 +85,9 @@ export function Sidebar() {
         borderRight: '1px solid rgba(0,0,0,0.09)',
         display: 'flex',
         flexDirection: 'column',
-        minHeight: '100vh',
-        position: 'sticky',
-        top: 0,
-        height: '100vh',
+        height: '100%',
         overflowY: 'auto',
+        flexShrink: 0,
       }}
     >
       {/* Logo / App header */}

@@ -17,20 +17,19 @@ export function PageLayout({ title, subtitle, children, actions, noHeader }: Pag
   const unreadCount = useNotificationStore((s) => s.unreadCount)
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', background: '#F0F4F8' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', background: '#F0F4F8', overflow: 'hidden' }}>
       {/* ── ws-topbar ─────────────────────────────────────────────────────── */}
       <div style={{
         height: 44,
+        minHeight: 44,
         background: '#fff',
         borderBottom: '1px solid rgba(0,0,0,0.09)',
         display: 'flex',
         alignItems: 'center',
         padding: '0 16px',
         gap: 10,
-        position: 'sticky',
-        top: 0,
-        zIndex: 100,
         flexShrink: 0,
+        zIndex: 100,
       }}>
         <button style={{
           background: 'none',
@@ -99,25 +98,24 @@ export function PageLayout({ title, subtitle, children, actions, noHeader }: Pag
       </div>
 
       {/* ── Body row ──────────────────────────────────────────────────────── */}
-      <div style={{ display: 'flex', flex: 1, minHeight: 0 }}>
+      <div style={{ display: 'flex', flex: 1, minHeight: 0, overflow: 'hidden' }}>
         <Sidebar />
 
         {/* Main area */}
-        <main style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0, overflow: 'hidden' }}>
+        <main style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
           {/* Page nav / header */}
           {!noHeader && (
             <div style={{
               height: 52,
+              minHeight: 52,
               background: '#fff',
               borderBottom: '1px solid rgba(0,0,0,0.09)',
               display: 'flex',
               alignItems: 'center',
               padding: '0 20px',
               gap: 12,
-              position: 'sticky',
-              top: 44,
-              zIndex: 90,
               flexShrink: 0,
+              zIndex: 90,
             }}>
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ fontSize: 15, fontWeight: 700, color: '#111827', lineHeight: 1.2 }}>
@@ -139,6 +137,7 @@ export function PageLayout({ title, subtitle, children, actions, noHeader }: Pag
                 padding: 4,
                 borderRadius: 8,
                 color: '#374151',
+                flexShrink: 0,
               }}>
                 🔔
                 {unreadCount > 0 && (
@@ -161,15 +160,15 @@ export function PageLayout({ title, subtitle, children, actions, noHeader }: Pag
                 )}
               </button>
               {actions && (
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
                   {actions}
                 </div>
               )}
             </div>
           )}
 
-          {/* Page content */}
-          <div style={{ flex: 1, overflowY: 'auto', padding: 20 }}>
+          {/* Page content — only this scrolls */}
+          <div style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden', padding: 20 }}>
             {children}
           </div>
         </main>
