@@ -9,8 +9,8 @@ import { ToastProvider } from './shared/components/ui/Toast'
 import { ErrorBoundary } from './shared/components/ErrorBoundary'
 import './index.css'
 
-const USE_MOCKS =
-  import.meta.env.DEV || import.meta.env.VITE_USE_MOCKS === 'true'
+// Luôn dùng mock — chưa có real backend
+const USE_MOCKS = true
 
 async function prepare() {
   if (USE_MOCKS) {
