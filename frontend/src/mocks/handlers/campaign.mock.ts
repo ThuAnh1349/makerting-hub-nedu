@@ -95,18 +95,19 @@ const campPosts: Record<string, unknown[]> = {
 
 export const campaignHandlers = [
   http.get('/api/v1/marketing/campaigns', () => {
-    return HttpResponse.json({
-      data: mockCampaigns,
-      meta: { total: mockCampaigns.length, page: 1, per_page: 20, has_next: false, next_cursor: null },
-    })
+    return HttpResponse.json(mockCampaigns)
   }),
 
   http.post('/api/v1/marketing/campaigns', async ({ request }) => {
     const body = await request.json() as Record<string, unknown>
-    return HttpResponse.json({
+    const newCamp = {
       id: `camp-${Date.now()}`,
-      ...body,
-      current_phase: 'opening',
+      title: String(body.title ?? ''),
+      description: String(body.icp_description ?? body.description ?? ''),
+      current_phase: 'opening' as const,
+      start_date: body.start_date ?? null,
+      end_date: body.end_date ?? null,
+      budget_vnd: Number(body.budget_total ?? 0),
       spend_vnd: 0,
       reach_total: 0,
       lead_count: 0,
@@ -114,7 +115,9 @@ export const campaignHandlers = [
       created_by: LEADER,
       post_counts: { total: 0, published: 0, scheduled: 0, draft: 0 },
       created_at: new Date().toISOString(),
-    }, { status: 201 })
+    }
+    mockCampaigns.unshift(newCamp)
+    return HttpResponse.json(newCamp, { status: 201 })
   }),
 
   http.get('/api/v1/marketing/campaigns/:id', ({ params }) => {
