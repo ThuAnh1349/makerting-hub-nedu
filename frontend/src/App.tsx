@@ -7,12 +7,12 @@ import { Modal } from './shared/components/ui/Modal'
 import { useAuthStore } from './shared/stores/auth.store'
 
 const ROUTE_SHORTCUTS: Record<string, string> = {
-  '1': '/today',
-  '2': '/inbox',
-  '3': '/content',
+  '1': '/dashboard',
+  '2': '/leads',
+  '3': '/posts',
   '4': '/calendar',
   '5': '/analytics',
-  '6': '/docs',
+  '6': '/documents',
 }
 
 export default function App() {

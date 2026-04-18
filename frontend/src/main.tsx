@@ -9,17 +9,18 @@ import { ToastProvider } from './shared/components/ui/Toast'
 import { ErrorBoundary } from './shared/components/ErrorBoundary'
 import './index.css'
 
-// Luôn dùng mock — chưa có real backend
-const USE_MOCKS = true
-
 async function prepare() {
-  if (USE_MOCKS) {
+  // Use VITE_ENABLE_MOCKING env var (set to 'true' in .env.local for local dev)
+  // Fallback: always enable mocks if env var not set (local dev convenience)
+  const mockingEnabled = import.meta.env.VITE_ENABLE_MOCKING === 'true' || !import.meta.env.VITE_ENABLE_MOCKING
+  if (mockingEnabled) {
     try {
       const { worker } = await import('./mocks/browser')
       await worker.start({
         onUnhandledRequest: 'bypass',
         serviceWorker: { url: '/mockServiceWorker.js' },
       })
+      console.log('[MSW] Mocking enabled.')
     } catch (e) {
       console.warn('[MSW] Service worker not available, skipping mocks:', e)
     }

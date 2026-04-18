@@ -1,31 +1,32 @@
-import { todayHandlers } from './today.mock'
-import { leadHandlers } from './lead.mock'
-import { postHandlers } from './post.mock'
-import { channelHandlers } from './channel.mock'
-import { notificationHandlers } from './notification.mock'
-import { calendarHandlers } from './calendar.mock'
-import { analyticsHandlers } from './analytics.mock'
-import { brandHealthHandlers } from './brand-health.mock'
-import { campaignHandlers } from './campaign.mock'
-import { briefHandlers } from './brief.mock'
-import { docsHandlers } from './docs.mock'
-import { storyHandlers } from './story.mock'
-import { budgetHandlers } from './budget.mock'
-import { referralHandlers } from './referral.mock'
+// src/mocks/handlers/index.ts
+// Aggregate all handlers — used by browser.ts via direct imports
+// This file kept for backward compatibility
+import { authHandlers }          from './auth'
+import { dashboardHandlers }     from './dashboard'
+import { leadsHandlers }         from './leads'
+import { postsHandlers }         from './posts'
+import { analyticsHandlers }     from './analytics'
+import { brandHealthHandlers }   from './brand-health'
+import { campaignsHandlers }     from './campaigns'
+import { storiesHandlers }       from './stories'
+import { budgetHandlers }        from './budget'
+import { referralsHandlers }     from './referrals'
+import { briefsHandlers }        from './briefs'
+import { notificationsHandlers } from './notifications'
+import { documentsHandlers }     from './documents'
 
 export const handlers = [
-  ...todayHandlers,
-  ...leadHandlers,
-  ...postHandlers,
-  ...channelHandlers,
-  ...notificationHandlers,
-  ...calendarHandlers,
+  ...authHandlers,
+  ...dashboardHandlers,
+  ...leadsHandlers,
+  ...postsHandlers,
   ...analyticsHandlers,
   ...brandHealthHandlers,
-  ...campaignHandlers,
-  ...briefHandlers,
-  ...docsHandlers,
-  ...storyHandlers,
+  ...campaignsHandlers,
+  ...storiesHandlers,
   ...budgetHandlers,
-  ...referralHandlers,
+  ...referralsHandlers,
+  ...briefsHandlers,
+  ...notificationsHandlers,
+  ...documentsHandlers,
 ]

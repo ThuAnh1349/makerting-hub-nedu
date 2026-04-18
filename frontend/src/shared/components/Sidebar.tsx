@@ -29,13 +29,13 @@ type NavEntry = NavSection | NavDivider | NavItem
 // ── Navigation config (mirrors marketing-hub-v8.html sidebar) ────────────────
 
 const NAV_ENTRIES: NavEntry[] = [
-  { type: 'item', label: 'Hôm nay',       path: '/today',        emoji: '🏠' },
-  { type: 'item', label: 'Inbox & Lead',   path: '/inbox',        emoji: '📩' },
-  { type: 'item', label: 'Nội dung',       path: '/content',      emoji: '✍️' },
+  { type: 'item', label: 'Hôm nay',       path: '/dashboard',    emoji: '🏠' },
+  { type: 'item', label: 'Inbox & Lead',   path: '/leads',        emoji: '📩' },
+  { type: 'item', label: 'Nội dung',       path: '/posts',        emoji: '✍️' },
   { type: 'item', label: 'Lịch đăng bài',  path: '/calendar',     emoji: '📅' },
   { type: 'item', label: 'Kết quả & KPI',  path: '/analytics',    emoji: '📊' },
   { type: 'divider' },
-  { type: 'item', label: 'Hệ thống',       path: '/docs',         emoji: '🗂' },
+  { type: 'item', label: 'Hệ thống',       path: '/documents',    emoji: '🗂' },
   { type: 'divider' },
   { type: 'section', label: 'Tăng trưởng dài hạn' },
   {
@@ -56,13 +56,13 @@ const NAV_ENTRIES: NavEntry[] = [
     requiredRoles: [ROLES.MARKETING_LEADER],
   },
   {
-    type: 'item', label: 'Referral Loop',  path: '/referral',     emoji: '🔄',
+    type: 'item', label: 'Referral Loop',  path: '/referrals',    emoji: '🔄',
     badge: '12', badgeColor: '#16a34a',
   },
   { type: 'divider' },
   { type: 'section', label: 'Đặt việc' },
-  { type: 'item', label: 'Đặt Design',     path: '/briefs?type=design',         emoji: '🎨' },
-  { type: 'item', label: 'Đặt Editing',    path: '/briefs?type=video_editing',  emoji: '🎬' },
+  { type: 'item', label: 'Đặt Design',     path: '/briefs?type=design',    emoji: '🎨' },
+  { type: 'item', label: 'Đặt Editing',    path: '/briefs?type=editing',   emoji: '🎬' },
 ]
 
 // ── Sidebar Component ─────────────────────────────────────────────────────────
@@ -163,7 +163,7 @@ export function Sidebar() {
           // NavItem
           if (entry.requiredRoles && !hasAnyRole(entry.requiredRoles)) return null
 
-          const isInbox = entry.path === '/inbox'
+          const isInbox = entry.path === '/leads'
           const active = isNavActive(entry.path)
 
           return (

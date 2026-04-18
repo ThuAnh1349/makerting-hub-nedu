@@ -10,17 +10,17 @@ interface Command {
 }
 
 const ALL_COMMANDS: Command[] = [
-  { id: 'today', label: 'Hôm nay', description: 'Tổng quan ngày hôm nay', path: '/today', icon: '☀️' },
-  { id: 'inbox', label: 'Inbox & Lead', description: 'Quản lý lead và tin nhắn', path: '/inbox', icon: '📥' },
-  { id: 'content', label: 'Nội dung', description: 'Quản lý nội dung', path: '/content', icon: '📝' },
+  { id: 'dashboard', label: 'Hôm nay', description: 'Tổng quan ngày hôm nay', path: '/dashboard', icon: '☀️' },
+  { id: 'leads', label: 'Inbox & Lead', description: 'Quản lý lead và tin nhắn', path: '/leads', icon: '📥' },
+  { id: 'posts', label: 'Nội dung', description: 'Quản lý nội dung', path: '/posts', icon: '📝' },
   { id: 'calendar', label: 'Lịch đăng bài', description: 'Lịch xuất bản nội dung', path: '/calendar', icon: '📅' },
   { id: 'analytics', label: 'Kết quả & KPI', description: 'Báo cáo và phân tích', path: '/analytics', icon: '📊' },
-  { id: 'docs', label: 'Hệ thống tài liệu', description: 'Tài liệu nội bộ', path: '/docs', icon: '📚' },
+  { id: 'documents', label: 'Hệ thống tài liệu', description: 'Tài liệu nội bộ', path: '/documents', icon: '📚' },
   { id: 'campaigns', label: 'Campaign View', description: 'Quản lý chiến dịch', path: '/campaigns', icon: '🎯' },
   { id: 'brand-health', label: 'Brand Health', description: 'Sức khỏe thương hiệu', path: '/brand-health', icon: '❤️' },
   { id: 'budget', label: 'Budget & ROI', description: 'Ngân sách và hiệu quả đầu tư', path: '/budget', icon: '💰' },
   { id: 'stories', label: 'Story Pipeline', description: 'Quản lý story', path: '/stories', icon: '🎬' },
-  { id: 'referral', label: 'Referral Loop', description: 'Chương trình giới thiệu', path: '/referral', icon: '🔗' },
+  { id: 'referrals', label: 'Referral Loop', description: 'Chương trình giới thiệu', path: '/referrals', icon: '🔗' },
   { id: 'briefs', label: 'Đặt việc', description: 'Tạo và quản lý brief', path: '/briefs', icon: '📋' },
 ]
 

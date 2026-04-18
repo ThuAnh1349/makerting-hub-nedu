@@ -1,0 +1,66 @@
+// src/mocks/data/notifications.ts
+import type { Notification } from '@modules/notifications/types'
+import { MOCK_PERSONS } from './persons'
+
+export const MOCK_NOTIFICATIONS: Notification[] = [
+  {
+    id: 'notif-0001-aaaa-bbbb-cccc-dddddddddddd',
+    person_id: MOCK_PERSONS[3].id,
+    type: 'lead_new',
+    title: 'Lead mới từ TikTok',
+    body: 'Trần Văn Hùng vừa nhắn tin: "Em muốn đăng ký ngay, giá bao nhiêu?"',
+    read: false,
+    action_url: '/mkt/leads',
+    created_at: '2026-04-07T06:30:00.000Z',
+  },
+  {
+    id: 'notif-0002-aaaa-bbbb-cccc-dddddddddddd',
+    person_id: MOCK_PERSONS[3].id,
+    type: 'post_rejected',
+    title: 'Bài viết bị từ chối',
+    body: 'Co-Leader từ chối bài "KHUYẾN MÃI GIẢM 50%": Giọng quá hoa mỹ, viết lại nhé',
+    read: false,
+    action_url: '/mkt/posts',
+    created_at: '2026-04-06T17:00:00.000Z',
+  },
+  {
+    id: 'notif-0003-aaaa-bbbb-cccc-dddddddddddd',
+    person_id: MOCK_PERSONS[3].id,
+    type: 'lead_returned',
+    title: 'Lead bị Tư vấn trả về',
+    body: 'Đinh Công Mạnh: Số điện thoại sai, không liên lạc được. Cần xác nhận lại.',
+    read: false,
+    action_url: '/mkt/leads?status=returned',
+    created_at: '2026-04-07T11:00:00.000Z',
+  },
+  {
+    id: 'notif-0004-aaaa-bbbb-cccc-dddddddddddd',
+    person_id: MOCK_PERSONS[2].id,
+    type: 'post_approved',
+    title: '2 bài chờ bạn duyệt',
+    body: 'Có 2 bài mới gửi yêu cầu duyệt từ Staff 01',
+    read: false,
+    action_url: '/mkt/posts?status=pending_review',
+    created_at: '2026-04-07T09:00:00.000Z',
+  },
+  {
+    id: 'notif-0005-aaaa-bbbb-cccc-dddddddddddd',
+    person_id: MOCK_PERSONS[3].id,
+    type: 'brief_done',
+    title: 'Brief đã hoàn thành',
+    body: 'Video testimonial tháng 4 đã được edit xong, link tải tại đây',
+    read: true,
+    action_url: '/mkt/briefs',
+    created_at: '2026-04-07T11:00:00.000Z',
+  },
+  {
+    id: 'notif-0006-aaaa-bbbb-cccc-dddddddddddd',
+    person_id: MOCK_PERSONS[1].id,
+    type: 'alumni_graduated',
+    title: 'Alumni mới tốt nghiệp',
+    body: 'Học viên vừa hoàn thành Leadership Foundations — kiểm tra chương trình referral',
+    read: false,
+    action_url: '/mkt/ambassadors',
+    created_at: '2026-04-07T12:00:00.000Z',
+  },
+]

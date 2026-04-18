@@ -14,9 +14,10 @@ interface ModalProps {
   title?: string
   children: ReactNode
   size?: ModalSize
+  noPadding?: boolean
 }
 
-export function Modal({ isOpen, onClose, title, children, size = 'md' }: ModalProps) {
+export function Modal({ isOpen, onClose, title, children, size = 'md', noPadding }: ModalProps) {
   useEffect(() => {
     if (!isOpen) return
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -110,7 +111,7 @@ export function Modal({ isOpen, onClose, title, children, size = 'md' }: ModalPr
         )}
 
         {/* Body */}
-        <div style={{ padding: '16px 20px', overflowY: 'auto' }}>
+        <div style={noPadding ? { flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column' } : { padding: '16px 20px', overflowY: 'auto' }}>
           {children}
         </div>
       </div>

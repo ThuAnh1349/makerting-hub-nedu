@@ -73,7 +73,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
                 Thử lại
               </button>
               <button
-                onClick={() => { window.location.href = '/today' }}
+                onClick={() => { window.location.href = '/dashboard' }}
                 className="px-4 py-2 text-sm font-medium font-body bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
               >
                 Về trang chủ
